@@ -1,26 +1,19 @@
 (require 'package)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
+(setq package-archives
+	     '(("melpa" . "https://melpa.org/packages/")
+              ("org" . "https://orgmode.org/elpa/")
+              ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 (package-refresh-contents)
 (require 'evil)
 (evil-mode 1)
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
-(use-package evil
-  :init      ;; tweak evil's configuration before loading it
-  (setq evil-want-keybinding nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (evil-mode))
-(use-package evil-collection
-  :after evil
-  :config
-  (setq evil-collection-mode-list '(dashboard dired ibuffer))
-  (evil-collection-init))
-(use-package evil-tutor)
+(setq use-package-always-ensure t)
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 (load-theme 'dracula t)
+; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 ;; Don't change the font size for some headings and titles (default t)
 (setq dracula-enlarge-headings nil)
 ;; Adjust font size of titles level 1 (default 1.3)
@@ -45,11 +38,40 @@
 (use-package doom-modeline
   :ensure t)
 (doom-modeline-mode 1)
+;; Ivy
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+;; Counsel
 ;; Line Number
-(display-line-numbers-mode)
+(column-number-mode)
+(global-display-line-numbers-mode t)
 (global-visual-line-mode t)
 ;; Relative Line Number
 (setq display-line-numbers 'relative)
+;; Which key
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
 ;; General Keybind
 (use-package general
   :ensure t
@@ -112,8 +134,8 @@
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
-  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner "~/Downloads/pngegg.png")  ;; use custom image as banner
+  (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+  ;;(setq dashboard-startup-banner "~/Downloads/pngegg.png")  ;; use custom image as banner
   (setq dashboard-center-content t) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
                           (agenda . 5 )
@@ -130,7 +152,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(evil-tutor which-key use-package general evil-multiedit evil-collection dracula-theme doom-modeline dashboard)))
+   '(counsel ivy-rich which-key use-package general evil-tutor evil-multiedit evil-collection dracula-theme doom-modeline dashboard)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
